@@ -29,10 +29,6 @@ public class Application {
     @Column(name = "cover_letter", columnDefinition = "TEXT")
     private String coverLetter;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "resume_file_id")
-    private ResumeFile resumeFile;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @Builder.Default

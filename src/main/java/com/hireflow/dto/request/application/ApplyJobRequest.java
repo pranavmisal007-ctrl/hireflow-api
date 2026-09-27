@@ -9,5 +9,5 @@ public class ApplyJobRequest {
     private Long jobId;
 
     private String coverLetter;
-    private Long resumeFileId;
+
 }

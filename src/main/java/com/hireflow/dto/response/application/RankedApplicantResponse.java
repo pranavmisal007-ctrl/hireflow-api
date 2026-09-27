@@ -23,5 +23,5 @@ public class RankedApplicantResponse {
     private Set<String> missingSkills;
     private LocalDateTime appliedAt;
     private String coverLetter;
-    private Long resumeFileId;
+
 }

@@ -63,9 +63,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/seeker/**").hasRole("SEEKER")
                 .requestMatchers(HttpMethod.POST, "/api/v1/applications").hasRole("SEEKER")
                 .requestMatchers("/api/v1/applications/my-applications").hasRole("SEEKER")
-                .requestMatchers("/api/v1/resume/**").hasRole("SEEKER")
                 .requestMatchers("/api/v1/saved-jobs/**").hasRole("SEEKER")
-                .requestMatchers(HttpMethod.GET, "/api/v1/dashboard/seeker").hasRole("SEEKER")
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/applications/{id}").hasRole("SEEKER")
 
                 // RECRUITER role
@@ -76,7 +74,6 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.PATCH, "/api/v1/jobs/{id}/toggle").hasRole("RECRUITER")
                 .requestMatchers(HttpMethod.GET, "/api/v1/jobs/my-posts").hasRole("RECRUITER")
                 .requestMatchers("/api/v1/interviews/**").hasAnyRole("RECRUITER", "SEEKER")
-                .requestMatchers(HttpMethod.GET, "/api/v1/dashboard/recruiter").hasRole("RECRUITER")
 
                 // ADMIN role
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")

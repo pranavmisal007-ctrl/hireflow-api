@@ -1,10 +1,10 @@
 # 🚀 HireFlow API
 
-> **Production-grade Job Board & Recruitment Platform REST API**
+> **Job Board & Recruitment Platform REST API**
 
 [![Java](https://img.shields.io/badge/Java-17-orange)](https://openjdk.org/projects/jdk/17/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-brightgreen)](https://spring.io/projects/spring-boot)
-[![MySQL](https://img.shields.io/badge/MySQL-8.0-blue)](https://www.mysql.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/Redis-7-red)](https://redis.io/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-blue)](https://docs.docker.com/compose/)
 [![Swagger](https://img.shields.io/badge/API-Swagger%20UI-85ea2d)](http://localhost:8080/swagger-ui.html)
@@ -13,7 +13,7 @@
 
 ## 📌 Resume Description
 
-> Designed and built a production-grade RESTful Job Board Platform API using Spring Boot 3.2, featuring JWT-based auth with refresh token rotation, role-based access control (Seeker / Recruiter / Admin), Jaccard similarity–based skill-gap matching, async email notifications via JavaMailSender + Spring Events, Redis caching with `@Cacheable`, PDF resume parsing with Apache PDFBox (ATS scoring), paginated job search with dynamic JPA Specifications, Flyway migrations, and full Swagger/OpenAPI documentation. Containerized via Docker Compose with MySQL 8, Redis, MailHog, and MinIO.
+> Designed and built a RESTful Job Board Platform API using Spring Boot 3.2, featuring JWT-based auth, role-based access control (Seeker / Recruiter / Admin), Jaccard similarity–based skill-gap matching, async email notifications via JavaMailSender + Spring Events, Redis caching with `@Cacheable`, paginated job search with dynamic JPA Specifications, Flyway migrations, and full Swagger/OpenAPI documentation. Containerized via Docker Compose with PostgreSQL 15, Redis, and MailHog.
 
 ---
 
@@ -23,14 +23,14 @@
 ┌─────────────────────────────────────────────────────────┐
 │                    REST Controllers                      │
 │   Auth | Jobs | Applications | Interviews | Profile      │
-│   Skills | Resume | Dashboard | Notifications | Admin    │
+│   Skills | Notifications | Admin                         │
 └─────────────────────┬───────────────────────────────────┘
                       │
 ┌─────────────────────▼───────────────────────────────────┐
 │                   Service Layer                          │
 │  AuthService | JobService | ApplicationService          │
-│  MatchingService | SkillGapService | ResumeParserService │
-│  InterviewService | NotificationService                  │
+│  MatchingService | SkillGapService | InterviewService    │
+│  NotificationService                                     │
 └──────┬─────────────────────┬───────────────────────────┘
        │                     │
 ┌──────▼──────┐    ┌─────────▼──────┐
@@ -39,8 +39,8 @@
 └──────┬──────┘    └─────────┬──────┘
        │                     │
 ┌──────▼──────┐    ┌─────────▼──────┐
-│  MySQL 8    │    │  Redis Cache   │    MinIO/S3
-└─────────────┘    └────────────────┘    MailHog
+│PostgreSQL 15│    │  Redis Cache   │    MailHog
+└─────────────┘    └────────────────┘
 ```
 
 ---
@@ -52,12 +52,10 @@
 | Language | Java 17 |
 | Framework | Spring Boot 3.2 |
 | Security | Spring Security + JWT (JJWT) |
-| Database | MySQL 8 + JPA / Hibernate |
+| Database | PostgreSQL 15 + JPA / Hibernate |
 | Migrations | Flyway |
 | Caching | Redis (`@Cacheable`) |
 | Email | Spring Mail + MailHog (dev) |
-| File Storage | AWS S3 / MinIO |
-| PDF Parsing | Apache PDFBox |
 | API Docs | Swagger / SpringDoc OpenAPI |
 | Testing | JUnit 5, Mockito |
 | Containerization | Docker + Docker Compose |
@@ -68,16 +66,14 @@
 
 | Role | Capabilities |
 |---|---|
-| **SEEKER** | Browse jobs, apply, manage profile, skill gap analysis, upload resume |
-| **RECRUITER** | Post jobs, view ranked applicants, schedule interviews, manage company |
+| **SEEKER** | Browse jobs, apply, manage profile, skill gap analysis |
+| **RECRUITER** | Post jobs, view applicants with skill-match scores, schedule interviews, manage company |
 | **ADMIN** | Platform overview, user management, force-delete jobs |
 
 ### Auth Flow
-1. `POST /api/v1/auth/register` → OTP email sent
-2. `POST /api/v1/auth/verify-email` → Account verified
-3. `POST /api/v1/auth/login` → `{ accessToken, refreshToken }`
-4. Include `Authorization: Bearer <accessToken>` on protected endpoints
-5. `POST /api/v1/auth/refresh` → Rotate access token (7-day refresh token)
+1. `POST /api/v1/auth/register` → Register account
+2. `POST /api/v1/auth/login` → `{ accessToken }`
+3. Include `Authorization: Bearer <accessToken>` on protected endpoints
 
 ---
 
@@ -100,16 +96,9 @@ Returns matched skills, missing required skills, and a recommendation.
 - Missing optional skills (yellow)
 - Personalized recommendation
 
-### PDF Resume ATS Scoring
-`POST /api/v1/resume/analyze` (multipart/form-data):
-- Extracts text with Apache PDFBox
-- Detects sections (Experience, Education, Skills, Contact)
-- Scores keywords, action verbs, and completeness
-- Returns 0-100 ATS score with recommendations
-
 ### Async Email Notifications (Spring Events)
 Events are published from services and consumed asynchronously:
-- `UserRegisteredEvent` → OTP email
+- `UserRegisteredEvent` → Welcome email
 - `ApplicationSubmittedEvent` → Confirmation + recruiter notification
 - `ApplicationStatusChangedEvent` → Status update email
 - `InterviewScheduledEvent` → Interview invite email
@@ -130,7 +119,7 @@ Events are published from services and consumed asynchronously:
 git clone https://github.com/pranavmisal007-ctrl/hireflow-api.git
 cd hireflow-api
 
-# Start all services (MySQL, Redis, MailHog, MinIO, App)
+# Start all services (MySQL, Redis, MailHog, App)
 docker-compose up -d
 
 # View logs
@@ -140,13 +129,12 @@ docker-compose logs -f app
 The API will be available at: http://localhost:8080  
 Swagger UI: http://localhost:8080/swagger-ui.html  
 MailHog UI: http://localhost:8025  
-MinIO Console: http://localhost:9001 (minioadmin/minioadmin)
 
 ### Run Locally
 
 ```bash
 # Start infrastructure only
-docker-compose up -d mysql redis mailhog minio
+docker-compose up -d mysql redis mailhog
 
 # Copy env file
 cp .env.example .env
@@ -163,12 +151,8 @@ mvn spring-boot:run
 | Method | Endpoint | Description |
 |---|---|---|
 | POST | `/api/v1/auth/register` | Register (SEEKER/RECRUITER) |
-| POST | `/api/v1/auth/verify-email` | OTP verification |
 | POST | `/api/v1/auth/login` | Login → JWT tokens |
-| POST | `/api/v1/auth/refresh` | Rotate access token |
-| POST | `/api/v1/auth/logout` | Revoke refresh token |
-| POST | `/api/v1/auth/forgot-password` | Send reset link |
-| POST | `/api/v1/auth/reset-password` | Reset with token |
+| GET  | `/api/v1/auth/me` | Current user info |
 
 ### Jobs
 | Method | Endpoint | Description |
@@ -187,7 +171,7 @@ mvn spring-boot:run
 |---|---|---|
 | POST | `/api/v1/applications` | Apply to job (SEEKER) |
 | GET | `/api/v1/applications/my-applications` | My applications |
-| GET | `/api/v1/applications/job/{jobId}` | Ranked applicants (RECRUITER) |
+| GET | `/api/v1/applications/job/{jobId}` | Applicants with skill-match scores (RECRUITER) |
 | PATCH | `/api/v1/applications/{id}/status` | Update status (RECRUITER) |
 | DELETE | `/api/v1/applications/{id}` | Withdraw (SEEKER) |
 
@@ -207,44 +191,19 @@ mvn spring-boot:run
 | GET | `/api/v1/skills/categories` | All categories |
 | GET | `/api/v1/skills/gap/{jobId}` | Skill gap analysis (SEEKER) |
 
-### Resume
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/v1/resume/upload` | Upload PDF (5MB max) |
-| POST | `/api/v1/resume/analyze` | Upload + instant ATS analysis |
-| GET | `/api/v1/resume` | List resumes |
-| DELETE | `/api/v1/resume/{id}` | Delete resume |
-| PATCH | `/api/v1/resume/{id}/set-primary` | Set primary |
-
 ---
 
 ## 🗄️ Database Schema (7 Flyway Migrations)
 
 | Version | Description |
 |---|---|
-| V1 | Users, auth tokens (refresh, email-verify, password-reset) |
+| V1 | Users, auth tables |
 | V2 | Companies, seeker profiles, recruiter profiles |
 | V3 | Jobs, job_skills, skills, seeker_skills, experience, education, projects |
-| V4 | Resume files, applications, interviews |
+| V4 | Applications, interviews |
 | V5 | Saved jobs |
 | V6 | Notifications |
-| V7 | Seed 70+ skills (Java, React, AWS, Docker, etc.) |
-
----
-
-## 🧪 Tests
-
-```bash
-# Run all tests
-mvn test
-
-# Tests included:
-# - JaccardSimilarityUtilTest (7 test cases)
-# - SlugUtilTest (7 test cases)
-# - JwtUtilTest (4 test cases)
-# - SkillGapServiceTest (3 test cases)
-# - HireFlowApplicationTest (context load)
-```
+| V7 | Seed 70+ skills (Java, React, Docker, etc.) |
 
 ---
 
@@ -252,32 +211,20 @@ mvn test
 
 ```
 src/main/java/com/hireflow/
-├── config/          # Security, Redis, S3, JWT, Async, OpenAPI, JPA
-├── controller/      # 10 REST controllers
+├── config/          # Security, Redis, JWT, Async, OpenAPI, JPA
+├── controller/      # REST controllers
 ├── dto/             # Request/Response DTOs
 │   ├── request/
 │   └── response/
-├── entity/          # 24 JPA entities
-├── event/           # 4 Spring application events
+├── entity/          # JPA entities
+├── event/           # Spring application events
 ├── exception/       # GlobalExceptionHandler + custom exceptions
-├── listener/        # 4 async event listeners
-├── repository/      # 19 Spring Data JPA repositories
+├── listener/        # Async event listeners
+├── repository/      # Spring Data JPA repositories
 ├── security/        # JWT filter, UserPrincipal, CustomUserDetailsService
-├── service/         # 14 service classes
+├── service/         # Service classes
 └── util/            # JaccardSimilarity, SlugUtil, ProfileCompletionCalc
 ```
-
----
-
-## 🏷️ Commit Checkpoints
-
-| Checkpoint | Description |
-|---|---|
-| `CHECKPOINT-1` | Project setup, pom.xml, configuration, security layer |
-| `CHECKPOINT-2` | All 24 entities + 19 repositories |
-| `CHECKPOINT-3` | Exceptions, DTOs, utilities, Spring Events |
-| `CHECKPOINT-4` | All 14 services (Auth, Job, Application, Interview, etc.) |
-| `CHECKPOINT-5` | All 10 controllers, Flyway migrations, Docker, README |
 
 ---
 

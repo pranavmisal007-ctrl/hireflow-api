@@ -1,7 +1,7 @@
 -- V3: Jobs and Skills tables
 
 CREATE TABLE IF NOT EXISTS jobs (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     recruiter_id BIGINT NOT NULL,
     company_id BIGINT NOT NULL,
     title VARCHAR(200) NOT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS jobs (
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     views_count INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_job_recruiter FOREIGN KEY (recruiter_id) REFERENCES recruiter_profiles(id) ON DELETE CASCADE,
     CONSTRAINT fk_job_company FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
 );
@@ -30,7 +30,7 @@ CREATE INDEX idx_jobs_experience_level ON jobs(experience_level);
 CREATE INDEX idx_jobs_location ON jobs(location);
 
 CREATE TABLE IF NOT EXISTS job_skills (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     job_id BIGINT NOT NULL,
     skill_name VARCHAR(100) NOT NULL,
     is_required BOOLEAN NOT NULL DEFAULT TRUE,
@@ -38,13 +38,13 @@ CREATE TABLE IF NOT EXISTS job_skills (
 );
 
 CREATE TABLE IF NOT EXISTS skills (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
     category VARCHAR(100)
 );
 
 CREATE TABLE IF NOT EXISTS seeker_skills (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     seeker_profile_id BIGINT NOT NULL,
     skill_id BIGINT NOT NULL,
     proficiency VARCHAR(50),
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS seeker_skills (
 );
 
 CREATE TABLE IF NOT EXISTS experiences (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     seeker_profile_id BIGINT NOT NULL,
     company_name VARCHAR(200) NOT NULL,
     title VARCHAR(200) NOT NULL,
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS experiences (
 );
 
 CREATE TABLE IF NOT EXISTS educations (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     seeker_profile_id BIGINT NOT NULL,
     institution VARCHAR(200) NOT NULL,
     degree VARCHAR(100) NOT NULL,
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS educations (
 );
 
 CREATE TABLE IF NOT EXISTS projects (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     seeker_profile_id BIGINT NOT NULL,
     title VARCHAR(200) NOT NULL,
     description TEXT,

@@ -1,6 +1,6 @@
 -- V7: Seed skill master data
 
-INSERT IGNORE INTO skills (name, category) VALUES
+INSERT INTO skills (name, category) VALUES
 -- Programming Languages
 ('java', 'Programming Language'),
 ('python', 'Programming Language'),
@@ -91,4 +91,4 @@ INSERT IGNORE INTO skills (name, category) VALUES
 ('maven', 'Tool'),
 ('gradle', 'Tool'),
 ('hibernate', 'ORM'),
-('jpa', 'ORM');
+('jpa', 'ORM') ON CONFLICT (name) DO NOTHING;

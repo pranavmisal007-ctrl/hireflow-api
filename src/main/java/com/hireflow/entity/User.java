@@ -26,10 +26,6 @@ public class User extends AuditableEntity {
     @Column(nullable = false, length = 20)
     private Role role;
 
-    @Column(name = "is_email_verified", nullable = false)
-    @Builder.Default
-    private Boolean isEmailVerified = false;
-
     @Column(name = "is_active", nullable = false)
     @Builder.Default
     private Boolean isActive = true;

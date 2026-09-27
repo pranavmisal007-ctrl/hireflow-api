@@ -22,5 +22,5 @@ public class ApplicationResponse {
     private String recruiterNotes;
     private LocalDateTime appliedAt;
     private LocalDateTime updatedAt;
-    private Long resumeFileId;
+
 }

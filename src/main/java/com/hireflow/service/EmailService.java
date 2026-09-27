@@ -24,24 +24,9 @@ public class EmailService {
     private String baseUrl;
 
     @Async
-    public void sendVerificationOtp(String toEmail, String otp) {
-        String subject = "HireFlow - Verify Your Email";
-        String content = buildOtpEmailHtml(otp);
-        sendEmail(toEmail, subject, content);
-    }
-
-    @Async
     public void sendWelcomeEmail(String toEmail, String name) {
         String subject = "Welcome to HireFlow!";
         String content = buildWelcomeEmailHtml(name);
-        sendEmail(toEmail, subject, content);
-    }
-
-    @Async
-    public void sendPasswordResetEmail(String toEmail, String resetToken) {
-        String resetUrl = baseUrl + "/api/v1/auth/reset-password?token=" + resetToken;
-        String subject = "HireFlow - Reset Your Password";
-        String content = buildPasswordResetEmailHtml(resetUrl);
         sendEmail(toEmail, subject, content);
     }
 
@@ -82,24 +67,6 @@ public class EmailService {
         }
     }
 
-    private String buildOtpEmailHtml(String otp) {
-        return """
-            <!DOCTYPE html>
-            <html><body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-            <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; padding: 30px;">
-                <h2 style="color: #6366f1;">Verify Your Email</h2>
-                <p>Thank you for signing up for HireFlow! Use the OTP below to verify your email address.</p>
-                <div style="background: #f0f0ff; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0;">
-                    <h1 style="color: #6366f1; letter-spacing: 8px; font-size: 36px;">%s</h1>
-                </div>
-                <p style="color: #666;">This OTP expires in <strong>15 minutes</strong>. Do not share it with anyone.</p>
-                <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-                <p style="color: #999; font-size: 12px;">HireFlow — Your Dream Job Awaits</p>
-            </div>
-            </body></html>
-            """.formatted(otp);
-    }
-
     private String buildWelcomeEmailHtml(String name) {
         return """
             <!DOCTYPE html>
@@ -114,22 +81,6 @@ public class EmailService {
             </div>
             </body></html>
             """.formatted(name, baseUrl);
-    }
-
-    private String buildPasswordResetEmailHtml(String resetUrl) {
-        return """
-            <!DOCTYPE html>
-            <html><body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-            <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; padding: 30px;">
-                <h2 style="color: #6366f1;">Reset Your Password</h2>
-                <p>We received a request to reset your password. Click the button below to proceed.</p>
-                <a href="%s" style="background: #6366f1; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; display: inline-block; margin-top: 10px;">Reset Password</a>
-                <p style="color: #666; margin-top: 20px;">This link expires in <strong>30 minutes</strong>. If you didn't request this, ignore this email.</p>
-                <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-                <p style="color: #999; font-size: 12px;">HireFlow — Your Dream Job Awaits</p>
-            </div>
-            </body></html>
-            """.formatted(resetUrl);
     }
 
     private String buildApplicationConfirmationHtml(String jobTitle, String companyName) {

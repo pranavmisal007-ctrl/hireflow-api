@@ -12,7 +12,6 @@ public class ProfileCompletionCalculator {
     private final ExperienceRepository experienceRepository;
     private final EducationRepository educationRepository;
     private final SeekerSkillRepository skillRepository;
-    private final ResumeFileRepository resumeFileRepository;
 
     /**
      * Calculates profile completion % based on:
@@ -20,8 +19,7 @@ public class ProfileCompletionCalculator {
      * - Avatar uploaded: 10%
      * - At least 1 experience: 20%
      * - At least 1 education: 15%
-     * - At least 3 skills: 15%
-     * - At least 1 resume uploaded: 10%
+     * - At least 3 skills: 25%
      * - Bio filled: 5%
      * - Social links added: 5%
      */
@@ -50,15 +48,10 @@ public class ProfileCompletionCalculator {
             score += 15;
         }
 
-        // Skills (15%)
+        // Skills (25%)
         long skillCount = skillRepository.findBySeekerProfileId(profile.getId()).size();
         if (skillCount >= 3) {
-            score += 15;
-        }
-
-        // Resume (10%)
-        if (resumeFileRepository.countBySeekerProfileId(profile.getId()) >= 1) {
-            score += 10;
+            score += 25;
         }
 
         // Bio (5%)

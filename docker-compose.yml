@@ -1,21 +1,20 @@
 version: '3.8'
 
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: hireflow-mysql
+  postgres:
+    image: postgres:15
+    container_name: hireflow-postgres
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: hireflow
-      MYSQL_ROOT_PASSWORD: root123
-      MYSQL_USER: hireflow
-      MYSQL_PASSWORD: hireflow123
+      POSTGRES_DB: hireflow
+      POSTGRES_USER: hireflow
+      POSTGRES_PASSWORD: hireflow123
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot123"]
+      test: ["CMD-SHELL", "pg_isready -U hireflow -d hireflow"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -44,24 +43,6 @@ services:
     logging:
       driver: none
 
-  minio:
-    image: minio/minio
-    container_name: hireflow-minio
-    restart: unless-stopped
-    command: server /data --console-address ":9001"
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-    ports:
-      - "9000:9000"   # S3 API
-      - "9001:9001"   # Web Console
-    volumes:
-      - minio_data:/data
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 30s
-      timeout: 20s
-      retries: 3
 
   app:
     build:
@@ -72,23 +53,18 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      mysql:
+      postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
     environment:
-      DB_URL: jdbc:mysql://mysql:3306/hireflow?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_URL: jdbc:postgresql://postgres:5432/hireflow
       DB_USERNAME: hireflow
       DB_PASSWORD: hireflow123
       REDIS_HOST: redis
       REDIS_PORT: 6379
       MAIL_HOST: mailhog
       MAIL_PORT: 1025
-      S3_ENDPOINT: http://minio:9000
-      S3_BUCKET: hireflow-bucket
-      AWS_ACCESS_KEY: minioadmin
-      AWS_SECRET_KEY: minioadmin
-      AWS_REGION: us-east-1
       JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
       BASE_URL: http://localhost:8080
     healthcheck:
@@ -98,6 +74,5 @@ services:
       retries: 5
 
 volumes:
-  mysql_data:
+  postgres_data:
   redis_data:
-  minio_data:

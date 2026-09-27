@@ -21,6 +21,6 @@ public class UserRegisteredListener {
     @EventListener
     public void handle(UserRegisteredEvent event) {
         log.info("Handling UserRegisteredEvent for userId={}", event.getUser().getId());
-        emailService.sendVerificationOtp(event.getUser().getEmail(), event.getOtp());
+        emailService.sendWelcomeEmail(event.getUser().getEmail(), "User");
     }
 }

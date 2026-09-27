@@ -25,12 +25,11 @@ public class OpenApiConfig {
                     ## HireFlow — Job Board & Recruitment Platform API
                     
                     A production-grade RESTful API featuring:
-                    - **JWT Authentication** with refresh token rotation
+                    - **JWT Authentication**
                     - **Role-based access control** (Seeker / Recruiter / Admin)
                     - **Skill-gap matching** using Jaccard similarity
                     - **Async email notifications** via Spring Events
                     - **Redis caching** for high-performance job listings
-                    - **PDF resume parsing** with ATS scoring
                     - **Full Swagger/OpenAPI documentation**
                     """)
                 .version("1.0.0")

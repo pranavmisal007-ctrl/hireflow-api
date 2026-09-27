@@ -51,13 +51,15 @@ public class SavedJobController {
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size) {
         Page<SavedJob> savedJobs = savedJobService.getSavedJobs(principal, page, size);
-        List<Map<String, Object>> content = savedJobs.getContent().stream().map(sj -> Map.of(
-            "id", sj.getId(),
-            "jobId", sj.getJob().getId(),
-            "jobTitle", sj.getJob().getTitle(),
-            "companyName", sj.getJob().getCompany().getName(),
-            "savedAt", sj.getSavedAt().toString()
-        )).toList();
+        List<Map<String, Object>> content = savedJobs.getContent().stream().map(sj -> {
+            Map<String, Object> map = new java.util.HashMap<>();
+            map.put("id", sj.getId());
+            map.put("jobId", sj.getJob().getId());
+            map.put("jobTitle", sj.getJob().getTitle());
+            map.put("companyName", sj.getJob().getCompany().getName());
+            map.put("savedAt", sj.getSavedAt().toString());
+            return map;
+        }).toList();
 
         return ResponseEntity.ok(Map.of(
             "content", content,

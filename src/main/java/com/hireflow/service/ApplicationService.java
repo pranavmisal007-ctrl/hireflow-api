@@ -27,7 +27,7 @@ public class ApplicationService {
     private final ApplicationRepository applicationRepository;
     private final JobRepository jobRepository;
     private final UserRepository userRepository;
-    private final ResumeFileRepository resumeFileRepository;
+
     private final MatchingService matchingService;
     private final ApplicationEventPublisher eventPublisher;
     private final SeekerProfileRepository seekerProfileRepository;
@@ -56,17 +56,12 @@ public class ApplicationService {
             log.warn("Could not compute match score: {}", e.getMessage());
         }
 
-        ResumeFile resumeFile = null;
-        if (request.getResumeFileId() != null) {
-            resumeFile = resumeFileRepository.findById(request.getResumeFileId())
-                .orElseThrow(() -> new ResourceNotFoundException("ResumeFile", "id", request.getResumeFileId()));
-        }
+
 
         Application application = Application.builder()
             .job(job)
             .seeker(seeker)
             .coverLetter(request.getCoverLetter())
-            .resumeFile(resumeFile)
             .matchScore(matchScore)
             .appliedAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
@@ -134,7 +129,6 @@ public class ApplicationService {
                 .missingSkills(details.missingRequired())
                 .appliedAt(app.getAppliedAt())
                 .coverLetter(app.getCoverLetter())
-                .resumeFileId(app.getResumeFile() != null ? app.getResumeFile().getId() : null)
                 .build();
         }).toList();
     }
@@ -184,7 +178,6 @@ public class ApplicationService {
             .recruiterNotes(app.getRecruiterNotes())
             .appliedAt(app.getAppliedAt())
             .updatedAt(app.getUpdatedAt())
-            .resumeFileId(app.getResumeFile() != null ? app.getResumeFile().getId() : null)
             .build();
     }
 }

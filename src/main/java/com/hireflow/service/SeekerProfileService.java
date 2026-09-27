@@ -66,7 +66,7 @@ public class SeekerProfileService {
         checkItem("Work experience added", experienceRepository.countBySeekerProfileId(profile.getId()) >= 1, completed, pending);
         checkItem("Education added", educationRepository.countBySeekerProfileId(profile.getId()) >= 1, completed, pending);
         checkItem("At least 3 skills added", seekerSkillRepository.findBySeekerProfileId(profile.getId()).size() >= 3, completed, pending);
-        checkItem("Resume uploaded", true, completed, pending); // simplified
+
         checkItem("Bio filled", profile.getBio() != null && !profile.getBio().isBlank(), completed, pending);
         checkItem("Social links added", profile.getLinkedinUrl() != null || profile.getGithubUrl() != null, completed, pending);
 
